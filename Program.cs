@@ -12,7 +12,7 @@ public class Program
         GetUserCommandsFromConsole();
 
         ClearConsole();
-        Console.WriteLine("Stoping program...");
+        Console.WriteLine("Stopping program...");
         httpServer.Stop();
     }
 
@@ -22,8 +22,8 @@ public class Program
         {
             string cmd = "";
             int c = 0;
-            int[] eof = new int[]{-1, 0, 10, 13};
-            while( eof.Contains( (c = Console.Read() ) ) == false)
+            int[] eos = new int[]{-1, 0, 10, 13};
+            while( eos.Contains( (c = Console.Read() ) ) == false)
             {
                 cmd += (char) c;
             }
