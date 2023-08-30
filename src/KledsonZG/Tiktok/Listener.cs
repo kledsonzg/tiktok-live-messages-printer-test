@@ -1,4 +1,5 @@
 using System.Net;
+using KledsonZG.Util;
 
 namespace KledsonZG.Tiktok
 {
@@ -8,6 +9,7 @@ namespace KledsonZG.Tiktok
         internal Listener()
         {
             listener.Prefixes.Add("http://127.0.0.1:40019/chat/");
+            listener.Prefixes.Add("http://127.0.0.1:40019/setstream/");
             
             Thread thread = new Thread(new ThreadStart(delegate 
                 {
@@ -35,6 +37,12 @@ namespace KledsonZG.Tiktok
                 {
                     var ctx = requestListener.GetContext();
                     var request = ctx.Request;
+
+                    if(request.RawUrl == "/setstream")
+                    {
+                        PrintLiveInfo(ctx);
+                        continue;
+                    }
                     
                     var stream = request.InputStream;
                     int c = 0;
@@ -65,6 +73,40 @@ namespace KledsonZG.Tiktok
                     if(e.Message.Contains("E/S") == false)
                         Console.WriteLine("Houve um erro na instância listener: " + e.GetBaseException() + " " + e.Message);
                 }         
+            }
+        }
+
+        private void PrintLiveInfo(HttpListenerContext ctx)
+        {
+            try
+            {
+                var request = ctx.Request;
+                var streamUrl = request.Headers.Get("stream");
+                var response = ctx.Response;
+                var output = response.OutputStream;
+
+                response.ContentLength64 = 0;
+                
+                if(streamUrl == null)
+                {                       
+                    response.StatusCode = (int) HttpStatusCode.BadGateway;
+
+                    output.Close();
+                    return;
+                }
+
+                var streamInfo = Format.GetStreamNameByStreamURL(streamUrl);
+                var msg = "----------------------------------------------------------------------------------------------------\n" +
+                    "Live de: " + streamInfo + "\n" +
+                    "----------------------------------------------------------------------------------------------------";
+                Console.WriteLine(msg);
+
+                output.Close();
+                return;
+            }
+            catch
+            {
+                return;
             }
         }
     }
