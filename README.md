@@ -8,7 +8,7 @@ Este programa foi desenvolvido apenas por curiosidade minha.
 ->  Após fazer a leitura, é feito uma requisição HTTP POST para o servidor.
 
 ### Observações:
-Por estar utilizando o Power Automate para obter o chat das lives, é necessário ter uma instância de navegador aberta (Foi utilizado O Microsoft Edge nos testes).
+Por estar utilizando o Power Automate para obter o chat das lives, é necessário ter uma instância de navegador aberta (Foi utilizado O Microsoft Edge nos testes).  
 Ao printar as mensagens no console, os emojis são printados como "?".
 
 #### Captura de tela durante teste:
