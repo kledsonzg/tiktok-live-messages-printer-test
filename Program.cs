@@ -10,8 +10,10 @@ public class Program
         var httpServer = new Listener();
 
         GetUserCommandsFromConsole();
+
+        ClearConsole();
         Console.WriteLine("Stoping program...");
-        httpServer.httpListener.Stop();
+        httpServer.Stop();
     }
 
     private static void GetUserCommandsFromConsole()
@@ -20,13 +22,12 @@ public class Program
         {
             string cmd = "";
             int c = 0;
-
-            while( (c = Console.Read() ) != 10)
+            int[] eof = new int[]{-1, 0, 10, 13};
+            while( eof.Contains( (c = Console.Read() ) ) == false)
             {
                 cmd += (char) c;
             }
-            cmd = cmd.Substring(0);
-            Console.WriteLine(cmd + " == exit?" + " " + cmd == "exit");
+
             if(cmd == "exit")
                 break;
         }   
