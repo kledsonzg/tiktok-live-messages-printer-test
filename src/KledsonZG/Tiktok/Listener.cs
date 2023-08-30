@@ -4,7 +4,7 @@ namespace KledsonZG.Tiktok
 {
     internal class Listener
     {
-        HttpListener listener = new HttpListener();
+        private HttpListener listener = new HttpListener();
         internal Listener()
         {
             listener.Prefixes.Add("http://127.0.0.1:40019/chat/");
@@ -18,39 +18,53 @@ namespace KledsonZG.Tiktok
             listener.Start();
             thread.Start();
         }
-
+        internal void Stop()
+        {
+            if(listener.IsListening == false)
+                return;
+            
+            listener.Stop();
+        }
         internal HttpListener httpListener { get { return listener; } }
 
         private void HandleRequests(HttpListener requestListener)
         {
             while(requestListener.IsListening)
             {
-                var ctx = requestListener.GetContext();
-                var request = ctx.Request;
-                
-                var stream = request.InputStream;
-                int c = 0;
-                string body = "";
-
-                StreamReader reader = new StreamReader(stream, System.Text.Encoding.UTF8);
-                while( (c = reader.Read() ) != -1)
+                try
                 {
-                    body += (char) c;
-                }
-                
-                reader.Close();
-                stream.Flush();
-                
-                Console.WriteLine(body);
-                
-                var response = ctx.Response;
-                var msg = "Received successful!";
-                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(msg);
-                  
-                response.ContentLength64 = bytes.Length;
-                response.OutputStream.Write(bytes, 0, bytes.Length);
+                    var ctx = requestListener.GetContext();
+                    var request = ctx.Request;
+                    
+                    var stream = request.InputStream;
+                    int c = 0;
+                    string body = "";
 
-                response.OutputStream.Close();
+                    StreamReader reader = new StreamReader(stream, System.Text.Encoding.UTF8);
+                    while( (c = reader.Read() ) != -1)
+                    {
+                        body += (char) c;
+                    }
+                    
+                    reader.Close();
+                    stream.Flush();
+                    
+                    Console.WriteLine(body);
+                    
+                    var response = ctx.Response;
+                    var msg = "Received successful!";
+                    byte[] bytes = System.Text.Encoding.UTF8.GetBytes(msg);
+                    
+                    response.ContentLength64 = bytes.Length;
+                    response.OutputStream.Write(bytes, 0, bytes.Length);
+
+                    response.OutputStream.Close();
+                }
+                catch(Exception e)
+                {
+                    if(e.Message.Contains("E/S") == false)
+                        Console.WriteLine("Houve um erro na instância listener: " + e.GetBaseException() + " " + e.Message);
+                }         
             }
         }
     }
