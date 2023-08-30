@@ -1,6 +1,6 @@
 function ExecuteScript() 
 { 
-	let allElements = document.getElementsByTagName('div');
+	const allElements = document.getElementsByTagName('div');
 	let messageList = null;
 
 	for(let i = 0; i < allElements.length; i++)
