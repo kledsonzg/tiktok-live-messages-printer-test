@@ -9,3 +9,7 @@ Este programa foi desenvolvido apenas por curiosidade minha.
 
 ### Observações:
 Por estar utilizando o Power Automate para obter o chat das lives, é necessário ter uma instância de navegador aberta (Foi utilizado O Microsoft Edge nos testes).
+Ao printar as mensagens no console, os emojis são printados como "?".
+
+#### Captura de tela durante teste:
+![](https://raw.githubusercontent.com/kledsonzg/tiktok-live-messages-printer-test/main/screenshots/Captura%20de%20tela%202023-08-30%20003717.png)
