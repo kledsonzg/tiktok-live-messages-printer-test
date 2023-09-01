@@ -8,4 +8,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Selenium.Webdriver" Version="4.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="kDiv">
+      <HintPath>..\..\kDiv Library\kDiv\bin\Debug\net6.0\kDiv.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
 </Project>
