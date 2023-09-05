@@ -10,6 +10,7 @@ namespace KledsonZG.Tiktok
         private IWebElement? chatPanel;
         private IJavaScriptExecutor javaScript;
         private bool reading = false;
+        private bool canStop = false;
 
         internal DriverManager()
         {
@@ -17,7 +18,8 @@ namespace KledsonZG.Tiktok
             javaScript = (IJavaScriptExecutor) driver.Controller;
         }
 
-        internal bool Reading { get { return reading; } set{ reading = value; } }
+        internal bool Reading { get { return reading; } set{ canStop = !value; } }
+        internal Driver GetDriver() { return driver; }
 
         internal void Start(string url)
         {          
@@ -31,7 +33,7 @@ namespace KledsonZG.Tiktok
                 Thread.Sleep(1000);
             
             driver.SetURL(url);
-            Reading = true;
+            reading = true;
 
             new Thread(new ThreadStart(
                 delegate { InializeChatReader(); } 
@@ -59,47 +61,97 @@ namespace KledsonZG.Tiktok
             return null;
         }
 
+        private void CheckAndClickForNewMessages()
+        {
+            if(chatPanel == null)
+                return;
+            
+            try
+            {
+                var parent = (WebElement) javaScript.ExecuteScript("return arguments[0].parentNode;", chatPanel);
+                var buttonContainer = parent.FindElements(By.TagName("div") ).Where(p => p.GetAttribute("class").Contains("DivUnreadTips") ).First();
+                var button = (WebElement) javaScript.ExecuteScript("return arguments[0].childNodes[0];", buttonContainer);
+
+                button.Click();
+            }
+            catch{ return; }
+        }
+        
         private void InializeChatReader()
         {
+            while(chatPanel == null)
+            {
+                if(canStop)
+                {
+                    reading = false;
+                    break;
+                }
+
+                chatPanel = GetChatPanelElement();
+            }
+                
+            
             while(Reading)
             {
+                if(canStop)
+                {
+                    reading = false;
+                    break;
+                }
+                             
                 var contents = new List<Content>();
                 List<IWebElement> chatElements;
 
-                while(chatPanel == null)
-                    chatPanel = GetChatPanelElement();
-                
+                CheckAndClickForNewMessages();
+      
                 try
                 {
+                    if(chatPanel == null)
+                        throw new NullReferenceException("'chatPanel' possui um valor nulo.");
+                    
                     chatElements = chatPanel.FindElements(By.TagName("div") ).ToList();
                 }
                 catch
                 {
                     Thread.Sleep(1000);
+
+                    chatPanel = GetChatPanelElement();
                     while(chatPanel == null)
+                    {
+                        if(canStop)
+                        {
+                            reading = false;
+                            break;
+                        }
+
                         chatPanel = GetChatPanelElement();
+                    }                    
          
                     continue;
                 }           
 
                 for(int i = 0; i < chatElements.Count; i++)
                 {                  
-                    var element = chatElements[i];
-                    
-                    string className = element.GetAttribute("class");
-                    if(className.Contains(" read_completed") || className.Contains("DivChatMessage") == false)
+                    try
                     {
-                        chatElements.RemoveAt(i);
-                        i--;
-                        continue;
-                    }
+                        var element = chatElements[i];
+                        
+                        string className = element.GetAttribute("class");
+                        if(className.Contains(" read_completed") || className.Contains("DivChatMessage") == false)
+                        {
+                            chatElements.RemoveAt(i);
+                            i--;
+                            continue;
+                        }
 
-                    var content = ExtractContentFromElement(element);
-                    if(content == null)
-                        continue;
-                    
-                    javaScript.ExecuteScript("arguments[0].className += \" read_completed\"", element);
-                    contents.Add(content);
+                        var content = ExtractContentFromElement(element);
+                        if(content == null)
+                            continue;
+                        
+                        javaScript.ExecuteScript("arguments[0].className += \" read_completed\"", element);
+                        contents.Add(content);
+                    }
+                    catch { continue; }                
                 }
 
                 Printer.PrintChatMessages(contents);
