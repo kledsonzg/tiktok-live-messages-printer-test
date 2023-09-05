@@ -17,21 +17,7 @@ namespace KledsonZG.Browser
             if(process.Start() == false)
                 throw new Exception("Houve um erro ao iniciar o web driver.");
 
-            while(true)
-            {
-                var processes = Process.GetProcesses();
-                var canBreak = false;
-                foreach(var p in processes)
-                {
-                    if(p.ProcessName.Contains("Microsoft Edge") )
-                        continue;
-                    
-                    canBreak = true;
-                    break;
-                }
-                if(canBreak)
-                    break;
-            }
+            process.WaitForInputIdle();
 
             CurrentProcess = process;
         }
