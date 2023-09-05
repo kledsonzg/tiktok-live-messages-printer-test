@@ -18,7 +18,7 @@ namespace KledsonZG.Tiktok
             javaScript = (IJavaScriptExecutor) driver.Controller;
         }
 
-        internal bool Reading { get { return reading; } set{ canStop = !value; } }
+        internal bool Reading { get { return this.reading; } set{ canStop = !value; } }
         internal Driver GetDriver() { return driver; }
 
         internal void Start(string url)
@@ -33,7 +33,7 @@ namespace KledsonZG.Tiktok
                 Thread.Sleep(1000);
             
             driver.SetURL(url);
-            reading = true;
+            this.reading = true;
 
             new Thread(new ThreadStart(
                 delegate { InializeChatReader(); } 
@@ -83,7 +83,7 @@ namespace KledsonZG.Tiktok
             {
                 if(canStop)
                 {
-                    reading = false;
+                    this.reading = false;
                     break;
                 }
 
@@ -95,7 +95,7 @@ namespace KledsonZG.Tiktok
             {
                 if(canStop)
                 {
-                    reading = false;
+                    this.reading = false;
                     break;
                 }
                              
@@ -120,7 +120,7 @@ namespace KledsonZG.Tiktok
                     {
                         if(canStop)
                         {
-                            reading = false;
+                            this.reading = false;
                             break;
                         }
 
